@@ -1,35 +1,22 @@
-<template>
-  <h1>{{ msg }}</h1>
-  <div class="swiper-container-wrapper">
-    <div ref="swiperContainer" class="swiper">
-      <slot />
-      <div ref="mainPrev" class="swiper-button-prev" />
-      <div ref="mainNext" class="swiper-button-next" />
-    </div>
-    <div ref="swiperPagination" class="swiper-pagination" />
-  </div>
-</template>
-
 <script setup lang="ts">
-import { provide, ref, Ref, toRefs, watchEffect } from 'vue';
+import { ref, Ref, watchEffect } from 'vue';
 // eslint-disable-next-line import/no-named-as-default
-import Swiper, { Lazy, Navigation, Pagination, Zoom } from 'swiper';
-import { NavigationOptions, PaginationOptions } from 'swiper/types';
+import Swiper, { Navigation, Pagination, Zoom } from 'swiper';
+import {NavigationOptions, PaginationOptions, SwiperModule} from 'swiper/types';
+import { SwiperSlide } from 'swiper/vue/swiper-vue.js';
 
 defineProps<{ msg: string }>()
 
-const swiperContainer: Ref<HTMLElement | undefined> = ref();
+const swiper: Ref<HTMLElement | undefined> = ref();
 const mainPrev: Ref<HTMLElement | undefined> = ref();
 const mainNext: Ref<HTMLElement | undefined> = ref();
 const swiperPagination: Ref<HTMLElement | undefined> = ref();
 
 watchEffect(() => {
-  if (swiperContainer.value) {
+  if (swiper.value) {
 
     // install Swiper modules
-    Swiper.use([Navigation, Pagination, Lazy, Zoom]);
-    // or since version 7.0.0
-    // const modules: SwiperModule[] = [Navigation, Pagination, Lazy, Zoom];
+    const modules: SwiperModule[] = [Navigation, Pagination, Zoom];
 
     const mainNavigation: NavigationOptions = {
       nextEl: mainNext.value,
@@ -42,7 +29,7 @@ watchEffect(() => {
       clickable: true,
     };
 
-    new Swiper(swiperContainer.value, {
+    new Swiper(swiper.value, {
       breakpoints: {
         576: {
         },
@@ -65,17 +52,35 @@ watchEffect(() => {
       grabCursor: true,
       pagination: pagination,
       navigation: mainNavigation,
-      preloadImages: false,
-      lazy: true,
+      modules: modules
     });
   }
 
 });
 
-
-
 </script>
+
+<template>
+  <h1>{{ msg }}</h1>
+    <div ref="swiper" class="swiper">
+      <div ref="mainPrev" class="swiper-button-prev" />
+      <div ref="mainNext" class="swiper-button-next" />
+      <div ref="swiperPagination" class="swiper-pagination" />
+      <div class="swiper-wrapper">
+        <slot />
+      </div>
+    </div>
+
+</template>
+
 <style scoped>
+
+.swiper {
+  width: 100%;
+  height: 300px;
+  margin: 50px auto;
+}
+
 a {
   color: #42b983;
 }
@@ -91,4 +96,5 @@ code {
   border-radius: 4px;
   color: #304455;
 }
+
 </style>
